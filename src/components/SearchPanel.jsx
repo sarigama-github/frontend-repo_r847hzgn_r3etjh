@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-export default function SearchPanel() {
+export default function SearchPanel({ baseUrl }) {
   const [collection, setCollection] = useState('suspect');
   const [term, setTerm] = useState('');
   const [status, setStatus] = useState('');
@@ -25,7 +25,7 @@ export default function SearchPanel() {
   const search = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/search`, {
+      const res = await fetch(`${baseUrl}/api/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ collection, query, limit: 50 })

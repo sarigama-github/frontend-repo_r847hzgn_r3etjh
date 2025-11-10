@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function CaseForm({ onCreated }) {
+export default function CaseForm({ onCreated, baseUrl }) {
   const [form, setForm] = useState({ title: '', description: '', status: 'open', priority: 'medium', suspects: '', evidence: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -18,7 +18,7 @@ export default function CaseForm({ onCreated }) {
       }).filter(i => i.description) : [];
 
       const payload = { title: form.title, description: form.description || null, status: form.status, priority: form.priority, suspects, evidence, tags: [] };
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/cases`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const res = await fetch(`${baseUrl}/api/cases`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       if (!res.ok) throw new Error('Failed to create case');
       const data = await res.json();
       onCreated?.(data);

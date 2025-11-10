@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function SuspectForm({ onCreated }) {
+export default function SuspectForm({ onCreated, baseUrl }) {
   const [form, setForm] = useState({ full_name: '', aliases: '', dob: '', last_known_location: '', risk_level: 'medium', status: 'active', notes: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -24,7 +24,7 @@ export default function SuspectForm({ onCreated }) {
         notes: form.notes || null,
         tags: []
       };
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/suspects`, {
+      const res = await fetch(`${baseUrl}/api/suspects`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
       });
       if (!res.ok) throw new Error('Failed to create suspect');

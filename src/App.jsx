@@ -17,9 +17,11 @@ export default function App() {
   const [overview, setOverview] = useState({ suspects_sample: 0, cases_sample: 0, recent_suspects: [], recent_cases: [] });
   const [refreshKey, setRefreshKey] = useState(0);
 
+  const baseUrl = import.meta.env.VITE_BACKEND_URL || (typeof window !== 'undefined' ? window.location.origin.replace(':3000', ':8000') : '');
+
   const loadOverview = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/reports/overview?limit=6`);
+      const res = await fetch(`${baseUrl}/api/reports/overview?limit=6`);
       const data = await res.json();
       setOverview(data);
     } catch (e) {
@@ -42,11 +44,11 @@ export default function App() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <SuspectForm onCreated={() => setRefreshKey(k => k + 1)} />
-          <CaseForm onCreated={() => setRefreshKey(k => k + 1)} />
+          <SuspectForm baseUrl={baseUrl} onCreated={() => setRefreshKey(k => k + 1)} />
+          <CaseForm baseUrl={baseUrl} onCreated={() => setRefreshKey(k => k + 1)} />
         </div>
 
-        <SearchPanel />
+        <SearchPanel baseUrl={baseUrl} />
 
         <footer className="pt-6 text-center text-slate-500 text-sm">
           Secure dark theme with deep blues and grays, accented with amber.
