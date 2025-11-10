@@ -1,28 +1,57 @@
-import { useState } from 'react'
+import React, { useEffect, useState } from 'react';
+import Hero3D from './components/Hero3D';
+import SuspectForm from './components/SuspectForm';
+import CaseForm from './components/CaseForm';
+import SearchPanel from './components/SearchPanel';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+function Stat({ label, value }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Vibe Coding Platform
-        </h1>
-        <p className="text-gray-600 mb-6">
-          Your AI-powered development environment
-        </p>
-        <div className="text-center">
-          <button
-            onClick={() => setCount(count + 1)}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-          >
-            Count is {count}
-          </button>
-        </div>
-      </div>
+    <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 text-center">
+      <div className="text-3xl font-semibold text-amber-400">{value}</div>
+      <div className="text-slate-400 text-sm">{label}</div>
     </div>
-  )
+  );
 }
 
-export default App
+export default function App() {
+  const [overview, setOverview] = useState({ suspects_sample: 0, cases_sample: 0, recent_suspects: [], recent_cases: [] });
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const loadOverview = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/reports/overview?limit=6`);
+      const data = await res.json();
+      setOverview(data);
+    } catch (e) {
+      // ignore for now
+    }
+  };
+
+  useEffect(() => { loadOverview(); }, [refreshKey]);
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-200">
+      <div className="max-w-6xl mx-auto px-6 py-6 space-y-8">
+        <Hero3D />
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <Stat label="Recent suspects" value={overview.suspects_sample} />
+          <Stat label="Recent cases" value={overview.cases_sample} />
+          <Stat label="Open cases" value={overview.recent_cases?.filter(c => c.status !== 'closed').length || 0} />
+          <Stat label="High‑risk suspects" value={overview.recent_suspects?.filter(s => s.risk_level === 'high').length || 0} />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <SuspectForm onCreated={() => setRefreshKey(k => k + 1)} />
+          <CaseForm onCreated={() => setRefreshKey(k => k + 1)} />
+        </div>
+
+        <SearchPanel />
+
+        <footer className="pt-6 text-center text-slate-500 text-sm">
+          Secure dark theme with deep blues and grays, accented with amber.
+        </footer>
+      </div>
+    </div>
+  );
+}
